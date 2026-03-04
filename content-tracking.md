@@ -126,10 +126,12 @@
 
 ### 1-1. 기획서 수집
 
-- **Confluence URL**: 브라우저 자동화(`@browser` MCP)로 페이지 내용 읽기
+- **Confluence URL**: 브라우저 자동화(`@browser` MCP)로 **스크린샷 기반** 페이지 읽기
   - `mcp__claude-in-chrome__tabs_context_mcp`로 탭 확인
   - `mcp__claude-in-chrome__navigate`로 URL 이동
-  - `mcp__claude-in-chrome__get_page_text`로 텍스트 추출
+  - `mcp__claude-in-chrome__computer` action=`screenshot`으로 페이지 캡처
+  - 페이지가 길면 `scroll` → `screenshot`을 반복하여 전체 내용을 스크린샷으로 수집
+  - `get_page_text`는 사용하지 않는다 (Confluence 페이지의 표/이미지/레이아웃 정보가 누락되므로)
 - **텍스트**: 직접 사용
 - **파일 경로**: Read 도구로 파일 읽기
 
