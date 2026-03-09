@@ -51,10 +51,15 @@
 
 1. **TodoWrite 도구**에 남은 항목들을 등록합니다.
 2. 미완료 Todo 항목을 **순서대로** 수행합니다.
-3. 각 Todo 완료 시:
-   - TodoList 파일(`todo_*.md`)에서 해당 항목을 `[x]`로 체크
-   - "완료 기록" 섹션에 변경 내용 메모 추가
+3. 각 Todo 완료 시 **스크립트로 체크** (파일 직접 읽기/쓰기 금지):
+   ```bash
+   bash ~/.claude/scripts/todo-check.sh <todo_파일경로> <미체크항목번호> [완료메모]
+   ```
+   - `<미체크항목번호>`: 미체크 항목 중 N번째 (1이면 첫 번째 남은 항목)
+   - 예: `bash ~/.claude/scripts/todo-check.sh .claude/tasks/todo_20260305_feature.md 1 "파일A, 파일B 수정"`
+   - 스크립트가 자동으로: 체크 표시, 완료 기록 추가, 최종수정일 갱신
    - TodoWrite 도구에서도 completed로 마킹
+   - 진행 상태 확인: `bash ~/.claude/scripts/todo-check.sh <todo_파일경로> --status`
 4. 모든 Todo 완료 시 → **Phase 4로 진행**
 
 ### Phase 4: 완료 검증
@@ -65,24 +70,18 @@
 
 다음 항목들을 AI가 자동으로 수행하고 결과를 보고합니다:
 
-1. **MCP 컴파일 체크** (CLAUDE.md "Build Validation" 절차 준수):
-   - `read_console(action="clear")` → `refresh_unity(mode="force", compile="request", scope="all", wait_for_ready=true)` → `read_console(types=["error"], filter_text="error CS", format="detailed")`
-   - 에러가 있으면 수정 후 재검증 (Phase 3으로 돌아가 수정)
-   - **컴파일 성공할 때까지 Phase 4를 완료하지 않습니다.**
-
-2. **계획 대비 변경 대조**:
+1. **계획 대비 변경 대조**:
    - `git diff`로 실제 변경된 파일 목록 확인
    - 업무계획서의 "변경 사항 목록"과 대조
    - 누락된 변경이나 계획에 없는 변경이 있으면 보고
 
-3. **코드 품질 검사**:
-   - 변경된 C# 파일에 대해 `validate_script` 실행
+2. **코드 품질 검사**:
    - TODO/FIXME/HACK 주석이 남아있는지 확인
    - 구독 누락 검사: UniRx `.Subscribe()`에 `.AddTo()` 누락 여부
    - null 참조 위험이 명백한 코드가 없는지 확인
 
-4. **TodoList 완전성 확인**:
-   - `todo_*.md`의 모든 항목이 `[x]` 체크되었는지 확인
+3. **TodoList 완전성 확인**:
+   - `bash ~/.claude/scripts/todo-check.sh <todo_파일경로> --status` 로 확인
    - 미완료 항목이 있으면 이유를 정리
 
 #### 4-2. 사용자 확인 체크리스트 생성
@@ -111,7 +110,6 @@
 ## 6. 완료 검증
 
 ### AI 자동 검증 결과
-- ✅ 컴파일: 성공 (에러 0개)
 - ✅ 계획 대비 변경: 일치
 - ✅ 코드 품질: 이상 없음
 - ✅ TodoList: 전체 완료
